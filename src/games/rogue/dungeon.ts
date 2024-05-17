@@ -13,26 +13,32 @@ export const dungeonModule = (
     .addState<DungeonState>(createDungeonState(200, 200))
     .addSystem('render', renderDungeon)
 
-const createDungeonState = (width: number, height: number): DungeonState => ({
-  dungeon: {
-    bounds: rect2(0, 0, width, height),
-    walls: dungeonWalls(width, height, rect2(0, 0, 4, 4)),
-  },
-})
+const createDungeonState = (width: number, height: number): DungeonState => {
+  const walls = dungeonWalls(width, height, rect2(0, 0, 4, 4))
+  const visibleCells = walls.map(l => l.map(() => true))
+  return {
+    dungeon: {
+      bounds: rect2(0, 0, width, height),
+      walls,
+      visibleCells,
+    },
+  }
+}
 
 const renderDungeon: System<Entity, TerminalState & DungeonState> = ({
   state: {
     terminal: { buffer },
-    dungeon: { walls },
+    dungeon: { walls, visibleCells },
   },
 }) => {
   walls.forEach((xl, x) =>
     xl.forEach((isWall, y) => {
-      buffer.draw(x, y, 0, {
-        color: isWall ? Color.blue : Color.white,
-        bgColor: isWall ? Color.blue : Color.white,
-        charCode: ' '.charCodeAt(0),
-      })
+      visibleCells[x][y] &&
+        buffer.draw(x, y, 0, {
+          color: isWall ? Color.blue : Color.white,
+          bgColor: isWall ? Color.blue : Color.white,
+          charCode: ' '.charCodeAt(0),
+        })
     })
   )
 }
