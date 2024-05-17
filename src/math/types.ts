@@ -2,7 +2,12 @@ export interface Vec2Like {
   x: number
   y: number
 }
-
+export interface Rect2Like {
+  top: number
+  left: number
+  bottom: number
+  right: number
+}
 export interface Vec2 {
   x: number
   y: number
@@ -23,6 +28,9 @@ export interface Rect2 {
   left: number
   bottom: number
   right: number
+  round(): Rect2
   contains: (point: Vec2Like) => boolean
   dimensions: () => Vec2
+  covers(outer: Rect2Like): boolean
+  intersects(r: Rect2Like): boolean
 }
