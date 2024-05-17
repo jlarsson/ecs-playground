@@ -8,14 +8,15 @@ export interface Drawable {
   sprite: TerminalChar
 }
 
-export interface Player extends Drawable {
-  isPlayer: true
-}
-
 export interface Tile extends Drawable {
   tileType: TileType
 }
 
+export interface HeroState {
+  hero: {
+    position: Vec2
+  }
+}
 export interface DungeonState {
   dungeon: {
     bounds: Rect2
