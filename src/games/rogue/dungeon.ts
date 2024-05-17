@@ -10,7 +10,7 @@ export const dungeonModule = (
   builder: ApplicationBuilder<Entity, TerminalState>
 ) =>
   builder
-    .addState<DungeonState>(createDungeonState(100, 100))
+    .addState<DungeonState>(createDungeonState(200, 200))
     .addSystem('render', renderDungeon)
 
 const createDungeonState = (width: number, height: number): DungeonState => ({
@@ -21,7 +21,6 @@ const createDungeonState = (width: number, height: number): DungeonState => ({
 })
 
 const renderDungeon: System<Entity, TerminalState & DungeonState> = ({
-  query,
   state: {
     terminal: { buffer },
     dungeon: { walls },

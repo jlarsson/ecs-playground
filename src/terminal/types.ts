@@ -1,4 +1,5 @@
 import { ScreenBuffer } from 'terminal-kit'
+import { Vec2 } from '../math/types'
 
 export enum Color {
   black = 0,
@@ -25,6 +26,7 @@ export enum Color {
 export interface TerminalState {
   terminal: {
     screenBuffer: ScreenBuffer
+    screenOffset: Vec2
     buffer: DepthBuffer
     keyboard: any
   }
@@ -40,7 +42,6 @@ export interface DepthBuffer {
   width: number
   height: number
   draw: (x: number, y: number, zIndex: number, char: TerminalChar) => void
-  // writeTo: (tb: TextBuffer) => void
   writeTo: (sb: ScreenBuffer) => void
 }
 

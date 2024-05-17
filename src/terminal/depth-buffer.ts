@@ -1,23 +1,24 @@
 import { ScreenBuffer, Terminal } from 'terminal-kit'
 import { range } from '../lib'
-import { rect2 } from '../math'
+import { rect2, vec2 } from '../math'
 import { Vec2 } from '../math/types'
 import { DepthBuffer, TerminalChar, WidthHeight } from './types'
 
-export const createDepthBuffer = ({
-  width,
-  height,
-}: WidthHeight): DepthBuffer => {
+export const createDepthBuffer = (
+  { width, height }: WidthHeight,
+  offset: Vec2
+): DepthBuffer => {
   const buffers: TerminalChar[][][] = []
   const rect = rect2(0, 0, width, height)
   return {
     width,
     height,
     draw: (x, y, zIndex, char) => {
-      if (rect.contains({ x, y })) {
+      const p = vec2(x, y).substract(offset).round()
+      if (rect.contains(p)) {
         const zl = buffers[zIndex] || (buffers[zIndex] = [])
-        const xl = zl[x] || (zl[x] = [])
-        xl[y] = char
+        const xl = zl[p.x] || (zl[p.x] = [])
+        xl[p.y] = char
       }
     },
     writeTo: sb => {
@@ -42,19 +43,5 @@ export const createDepthBuffer = ({
         )
       )
     },
-    /*
-    writeTo: tb => {
-      const { x: width, y: height } = rect.dimensions().round()
-      const grid = range(height).map(() => range(width).map(() => ' '))
-      buffers.forEach(zlist =>
-        zlist.forEach((xlist, x) =>
-          xlist.forEach((sprite, y) => {
-            grid[y][x] = sprite
-          })
-        )
-      )
-      tb.setText(grid.map(row => row.join('')).join('\n'))
-    },
-    */
   }
 }

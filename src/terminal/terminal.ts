@@ -2,14 +2,16 @@ import { ScreenBuffer, terminal, TextBuffer } from 'terminal-kit'
 import { ApplicationBuilder, Entity, System } from '../ecs/types'
 import { createDepthBuffer } from './depth-buffer'
 import { Color, TerminalState } from './types'
+import { vec2 } from '../math'
 
 export const terminalModule = <E, S>(builder: ApplicationBuilder<E, S>) =>
   builder
     .addState<TerminalState>({
       terminal: {
         screenBuffer: new ScreenBuffer({ dst: terminal }),
+        screenOffset: vec2(0, 0),
         keyboard: {},
-        buffer: createDepthBuffer(terminal),
+        buffer: createDepthBuffer(terminal, vec2(0, 0)),
       },
     })
     .addSystem('startup', setupTerminal)
@@ -17,7 +19,10 @@ export const terminalModule = <E, S>(builder: ApplicationBuilder<E, S>) =>
       state.terminal.keyboard = {}
     })
     .addSystem('prerender', ({ state }) => {
-      state.terminal.buffer = createDepthBuffer(terminal)
+      state.terminal.buffer = createDepthBuffer(
+        terminal,
+        state.terminal.screenOffset
+      )
     })
     .addSystem('postrender', renderScene)
 
@@ -32,7 +37,10 @@ const setupTerminal: System<Entity, TerminalState> = ({ state }) => {
   })
   terminal.on('resize', (width: number, height: number) => {
     state.terminal.screenBuffer = new ScreenBuffer({ dst: terminal })
-    state.terminal.buffer = createDepthBuffer({ width, height })
+    state.terminal.buffer = createDepthBuffer(
+      { width, height },
+      state.terminal.screenOffset
+    )
   })
 }
 

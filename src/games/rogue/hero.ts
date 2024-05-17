@@ -1,8 +1,12 @@
+import { terminal } from 'terminal-kit'
 import { ApplicationBuilder, Entity, System } from '../../ecs/types'
 import { vec2 } from '../../math'
 import { Vec2 } from '../../math/types'
 import { Color, TerminalState } from '../../terminal/types'
 import { DungeonState, HeroState } from './types'
+import { buffer } from 'stream/consumers'
+
+const { max } = Math
 
 export const heroModule = (
   builder: ApplicationBuilder<Entity, TerminalState & DungeonState>
@@ -14,6 +18,7 @@ export const heroModule = (
       },
     })
     .addSystem('update', moveHero)
+    .addSystem('update', setViewPort)
     .addSystem('render', renderHero)
 
 const renderHero: System<Entity, TerminalState & HeroState> = ({
@@ -54,4 +59,18 @@ const moveHero: System<Entity, TerminalState & DungeonState & HeroState> = ({
       hero.position = newPos
     }
   }
+}
+
+const setViewPort: System<Entity, TerminalState & HeroState> = ({
+  state: {
+    hero: { position },
+    terminal,
+  },
+}) => {
+  const { width, height } = terminal.buffer
+
+  const ox = max(0, position.x - width / 2)
+  const oy = max(0, position.y - height / 2)
+
+  terminal.screenOffset = vec2(ox, oy)
 }
